@@ -1,5 +1,5 @@
+from utils import format_labels
 from utils import io
-from utils import format
 import sys
 
 
@@ -14,11 +14,12 @@ def prepare(data_id, cfg_path='./config.yml'):
 
     data['seq_length'] = data.text.map(str.split).apply(len)
 
-    data['label'] = data[cfg['label_col']].apply(format.sort_labels, args=[cfg['sep']])
-    data['str_label'] = data['label'].apply(format.join_labels)
+    data['label'] = data[cfg['label_col']].apply(format_labels.sort,
+                                                 args=[cfg['sep']])
+    data['str_label'] = data['label'].apply(format_labels.join)
 
-    unique_labels = format.get_unique_labels(data.label.tolist())
-    data['one_hot_labels'] = data['label'].apply(format.onehot_encoding,
+    unique_labels = format_labels.get_unique(data.label.tolist())
+    data['one_hot_labels'] = data['label'].apply(format_labels.encode_onehot,
                                                  args=[unique_labels])
     io.to_pickle(data, cfg['pkl_file'])
 
