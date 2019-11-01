@@ -5,7 +5,7 @@ import sys
 
 def prepare(data_id, cfg_path='./config.yml'):
 
-    cfg = io.load_yml('./config.yml', data_id)
+    cfg = io.load_yml(cfg_path, data_id)
     data = io.load_csv(cfg['data_path'], cfg['delimiter'])
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
