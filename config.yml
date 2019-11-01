@@ -1,0 +1,15 @@
+UPR:
+  data_path: 'gs://classification_data/UPR.csv'
+  output_file: 'gs://classification_data/UPR.pkl'
+  label_col: 'Issue'
+  text_col: 'Recommendation'
+  delimiter: ','
+  sep: ','
+
+PLAN:
+  data_path: 'gs://classification_data/PlanInternational_multilabel.csv'
+  output_file: 'gs://classification_data/PLAN.pkl'
+  label_col: 'topics'
+  text_col: 'Paragraph text'
+  delimiter: ','
+  sep: ','
