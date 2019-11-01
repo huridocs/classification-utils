@@ -6,7 +6,7 @@ UPR:
   delimiter: ','
   sep: ','
 
-PLAN:
+PlanInternational:
   data_file: 'gs://classification_data/PlanInternational_multilabel.csv'
   pkl_file: 'gs://classification_data/PLAN.pkl'
   label_col: 'topics'
