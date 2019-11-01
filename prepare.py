@@ -6,7 +6,7 @@ import sys
 def prepare(data_id, cfg_path='./config.yml'):
 
     cfg = io.load_yml(cfg_path, data_id)
-    data = io.load_csv(cfg['data_path'], cfg['delimiter'])
+    data = io.load_csv(cfg['data_file'], cfg['delimiter'])
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
     data = data[['text', cfg['label_col']]]
@@ -20,7 +20,7 @@ def prepare(data_id, cfg_path='./config.yml'):
     unique_labels = format.get_unique_labels(data.label.tolist())
     data['one_hot_labels'] = data['label'].apply(format.onehot_encoding,
                                                  args=[unique_labels])
-    io.to_pickle(data, cfg['output_file'])
+    io.to_pickle(data, cfg['pkl_file'])
 
 
 if __name__ == '__main__':

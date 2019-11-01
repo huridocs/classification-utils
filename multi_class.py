@@ -39,7 +39,7 @@ import tensorflow_hub as hub
 import pdb
 
 cfg = io.load_yml('./config.yml', DATA_ID)
-data = io.load_pickle(cfg['output_file'])
+data = io.load_pickle(cfg['pkl_file'])
 
 all_labels = format.get_unique_labels(data.label.tolist())
 tokenizer = run_classifier_with_tfhub.create_tokenizer_from_hub_module(BERT_MODEL_HUB)
