@@ -1,8 +1,7 @@
 import tensorflow as tf
 import pandas as pd
+import pickle
 import yaml
-import gcsfs
-import pdb
 
 
 def load_csv(path, delimiter=','):
@@ -15,15 +14,11 @@ def load_yml(path, data_id):
     return cfg[data_id]
 
 
-def load_from_bucket(bucket_path, delimiter):
-    with tf.gfile.Open(bucket_path, 'r') as f:
-        data = pd.read_csv(f, delimiter=delimiter)
-    return data
-
-
 def to_pickle(df, path):
-    df.to_pickle(path)
+    with tf.gfile.Open(path, 'wb') as f:
+        pickle.dump(df, f)
 
 
 def load_pickle(path):
-    return pd.read_pickle(path)
+    with tf.gfile.Open(path, 'rb') as f:
+        return pickle.load(f)
