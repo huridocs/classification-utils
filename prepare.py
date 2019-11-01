@@ -25,7 +25,7 @@ def prepare(data_id, cfg_path='./config.yml'):
 
 if __name__ == '__main__':
     DATA_ID = sys.argv[1]
-    if sys.argv[2]:
+    if len(sys.argv) > 2:
         cfg_path = sys.argv[2]
         prepare(DATA_ID, cfg_path)
     prepare(DATA_ID)
