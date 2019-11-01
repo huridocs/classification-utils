@@ -3,7 +3,7 @@ from utils import format
 import sys
 
 
-def prepare(data_id):
+def prepare(data_id, cfg_path='./config.yml'):
 
     cfg = io.load_yml('./config.yml', data_id)
     data = io.load_csv(cfg['data_path'], cfg['delimiter'])
@@ -25,4 +25,7 @@ def prepare(data_id):
 
 if __name__ == '__main__':
     DATA_ID = sys.argv[1]
+    if sys.argv[2]:
+        cfg_path = sys.argv[2]
+        prepare(DATA_ID, cfg_path)
     prepare(DATA_ID)
