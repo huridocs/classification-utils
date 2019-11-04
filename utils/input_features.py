@@ -222,7 +222,7 @@ def convert_single_example(ex_index, example, max_seq_length,
     assert len(segment_ids) == max_seq_length
 
     labels_ids = []
-    for label in example.labels:
+    for label in example.label:
         labels_ids.append(int(label))
 
     feature = InputFeatures(

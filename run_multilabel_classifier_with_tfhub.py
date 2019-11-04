@@ -151,18 +151,13 @@ def input_fn_builder(features, seq_length, is_training, drop_remainder):
         all_input_ids.append(feature.input_ids)
         all_input_mask.append(feature.input_mask)
         all_segment_ids.append(feature.segment_ids)
-        all_label_ids.append(feature.label_id)
+        all_label_ids.append(feature.label_ids)
 
     def input_fn(params):
         """The actual input function."""
         batch_size = params["batch_size"]
 
         num_examples = len(features)
-
-        print('params')
-        print('Num examples: {}'.format(num_examples))
-        print('all_label_ids: {}'.format(all_label_ids))
-        print('len(all_label_ids): {}'.format(len(all_label_ids)))
 
         # This is for demo purposes and does NOT scale to large data sets. We
         # do not use Dataset.from_generator() because that uses tf.py_func
@@ -184,8 +179,7 @@ def input_fn_builder(features, seq_length, is_training, drop_remainder):
                     shape=[num_examples, seq_length],
                     dtype=tf.int32),
             "label_ids":
-                #tf.constant(all_label_ids, shape=[num_examples, len(all_labels)], dtype=tf.int32),
-                tf.constant(all_label_ids, shape=[num_examples, len(all_label_ids)], dtype=tf.int32),
+                tf.constant(all_label_ids, shape=[num_examples, len(all_label_ids[0])], dtype=tf.int32),
         })
 
         if is_training:
