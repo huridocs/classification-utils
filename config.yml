@@ -13,3 +13,11 @@ PlanInternational:
   text_col: 'Paragraph text'
   delimiter: ','
   sep: ','
+
+PlanInternational_paragraphs:
+  data_file: 'gs://classification_data/PlanInternational_paragraphs.csv'
+  pkl_file: 'gs://classification_data/PLAN_paragraphs.pkl'
+  label_col: 'label'
+  text_col: 'text'
+  delimiter: ','
+  sep: ','
