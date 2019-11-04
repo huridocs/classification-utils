@@ -109,7 +109,7 @@ def convert_examples_to_features(examples,  max_seq_length, tokenizer):
         assert len(segment_ids) == max_seq_length
 
         labels_ids = []
-        for label in example.labels:
+        for label in example.label:
             labels_ids.append(int(label))
 
         if ex_index < 0:
