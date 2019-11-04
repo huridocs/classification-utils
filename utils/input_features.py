@@ -20,28 +20,27 @@ class InputFeatures(object):
         self.is_real_example = is_real_example
 
 
-def get_label(row, label_col, set_type):
+def get_label(row, set_type):
     if set_type == 'test':
         return 'nan'
-    return tokenization.convert_to_unicode(row[label_col])
+    return tokenization.convert_to_unicode(row['label'])
 
 
-def get_multilabels(row, label_col, nr_labels, set_type):
+def get_multilabels(row, nr_labels, set_type):
     if set_type == 'test':
         return [0] * nr_labels
-    return row[label_col]
+    return row['one_hot_labels']
 
 
-def create_examples(data, text_col, label_col, nr_labels=None,
-                    set_type='train', mode='multilabel'):
+def create_examples(data, nr_labels=None, set_type='train', mode='multilabel'):
     examples = []
     for index, row in data.iterrows():
         guid = "%s-%s" % (set_type, index)
-        text_a = tokenization.convert_to_unicode(row[text_col])
+        text_a = tokenization.convert_to_unicode(row['text'])
         if mode == 'singlelabel':
-            label = get_label(row, label_col, set_type)
+            label = get_label(row, set_type)
         if mode == 'multilabel':
-            label = get_multilabels(row, label_col, nr_labels, set_type)
+            label = get_multilabels(row, nr_labels, set_type)
         examples.append(InputExample(guid=guid, text_a=text_a, label=label))
     return examples
 
