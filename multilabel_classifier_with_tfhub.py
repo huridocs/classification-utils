@@ -1,6 +1,5 @@
 import tensorflow as tf
-import modeling
-import optimization
+from utils import modeling, optimization
 
 
 def create_model(is_training, input_ids, input_mask, segment_ids,

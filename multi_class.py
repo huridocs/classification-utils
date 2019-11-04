@@ -12,8 +12,7 @@ import os
 import pprint
 import tensorflow as tf
 import pandas as pd
-from utils import io, format
-from utils import DataProcessor
+from utils import io, format_labels, input_features
 
 DATA_ID = 'PLAN'
 DATA_ID = 'UPR'
@@ -31,8 +30,8 @@ USE_TPU = False
 
 import sys
 
-from utils import run_classifier
-from utils import run_classifier_with_tfhub
+import classifier
+import classifier_with_tfhub
 from utils import tokenization
 import tensorflow_hub as hub
 
@@ -41,8 +40,8 @@ import pdb
 cfg = io.load_yml('./config.yml', DATA_ID)
 data = io.load_pickle(cfg['pkl_file'])
 
-all_labels = format.get_unique_labels(data.label.tolist())
-tokenizer = run_classifier_with_tfhub.create_tokenizer_from_hub_module(BERT_MODEL_HUB)
+all_labels = format_labels.get_unique_labels(data.label.tolist())
+tokenizer = classifier_with_tfhub.create_tokenizer_from_hub_module(BERT_MODEL_HUB)
 
 train_values = data.sample(frac=0.7, random_state=72)[:100]
 test_values = data.drop(train_values.index)[:20]
@@ -60,8 +59,7 @@ SAVE_SUMMARY_STEPS = 500
 
 # Compute number of train and warmup steps from batch size
 #processor = multilabel')
-train_examples = DataProcessor.create_examples(train_values, 'text', 'label',
-                                               'train', 'multilabel')
+train_examples = input_features.create_examples(train_values, 'train', 'multilabel')
 num_train_steps = int(len(train_examples) / TRAIN_BATCH_SIZE * NUM_TRAIN_EPOCHS)
 num_warmup_steps = int(num_train_steps * WARMUP_PROPORTION)
 
@@ -84,7 +82,7 @@ def get_run_config(output_dir):
 # Force TF Hub writes to the GS bucket we provide.
 os.environ['TFHUB_CACHE_DIR'] = OUTPUT_DIR
 
-model_fn = run_classifier_with_tfhub.model_fn_builder(
+model_fn = classifier_with_tfhub.model_fn_builder(
   num_labels=len(all_labels),
   learning_rate=LEARNING_RATE,
   num_train_steps=num_train_steps,
@@ -104,13 +102,13 @@ estimator_from_tfhub = tf.contrib.tpu.TPUEstimator(
 
 # Train the model
 def model_train(estimator):
-  train_features = run_classifier.convert_examples_to_features(
+  train_features = classifier.convert_examples_to_features(
       train_examples, all_labels, MAX_SEQ_LENGTH, tokenizer)
   print('***** Started training at {} *****'.format(datetime.datetime.now()))
   print('  Num examples = {}'.format(len(train_examples)))
   print('  Batch size = {}'.format(TRAIN_BATCH_SIZE))
   tf.logging.info("  Num steps = %d", num_train_steps)
-  train_input_fn = run_classifier.input_fn_builder(
+  train_input_fn = classifier.input_fn_builder(
       features=train_features,
       seq_length=MAX_SEQ_LENGTH,
       is_training=True,
@@ -122,9 +120,9 @@ model_train(estimator_from_tfhub)
 
 def model_predict(estimator):
   # Make predictions on a subset of eval examples
-  prediction_examples = processor.create_examples(test_values, text_col, label_col, 'test')
-  input_features = run_classifier.convert_examples_to_features(prediction_examples, all_labels, MAX_SEQ_LENGTH, tokenizer)
-  predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
+  prediction_examples = input_features.create_examples(test_values, 'test')
+  input_features = classifier.convert_examples_to_features(prediction_examples, all_labels, MAX_SEQ_LENGTH, tokenizer)
+  predict_input_fn = classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
   predictions = estimator.predict(predict_input_fn)
 
   return [prediction['probabilities'] for prediction in predictions]
@@ -134,7 +132,7 @@ results = model_predict(estimator_from_tfhub)
 test_values['pred_label'] = [all_labels[elem.argmax()] for elem in results]
 test_values['pred_prob'] = [elem.max() for elem in results]
 
-test_values[[text_col, label_col, 'pred_label', 'pred_prob']][:20]
+test_values[['text', 'label', 'pred_label', 'pred_prob']][:20]
 
 from sklearn.metrics import precision_score, recall_score, f1_score
 
@@ -148,7 +146,7 @@ evaluation = {}
 
 for category in all_labels:
 
-  target = test_values[label_col] == category
+  target = test_values['label'] == category
   prediction = test_values['pred_label'] == category
 
   res = eval_category(target, prediction)
@@ -162,8 +160,8 @@ evaluation
 
 def model_eval(estimator):
   # Eval the model.
-  eval_examples = DataProcessor.create_examples(test_values, 'text', 'label')
-  eval_features = run_classifier.convert_examples_to_features(
+  eval_examples = input_features.create_examples(test_values, 'text', 'label')
+  eval_features = classifier.convert_examples_to_features(
       eval_examples, all_labels, MAX_SEQ_LENGTH, tokenizer)
   print('***** Started evaluation at {} *****'.format(datetime.datetime.now()))
   print('  Num examples = {}'.format(len(eval_examples)))
@@ -172,7 +170,7 @@ def model_eval(estimator):
   # Eval will be slightly WRONG on the TPU because it will truncate
   # the last batch.
   eval_steps = int(len(eval_examples) / EVAL_BATCH_SIZE)
-  eval_input_fn = run_classifier.input_fn_builder(
+  eval_input_fn = classifier.input_fn_builder(
       features=eval_features,
       seq_length=MAX_SEQ_LENGTH,
       is_training=False,
