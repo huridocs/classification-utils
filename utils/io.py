@@ -11,7 +11,7 @@ def load_csv(path, delimiter=','):
 def load_yml(path, data_id):
     with open(path, 'r') as f:
         cfg = yaml.load(f, Loader=yaml.BaseLoader)
-    return cfg[data_id]
+        return cfg[data_id]
 
 
 def to_pickle(df, path):

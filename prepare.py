@@ -29,4 +29,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         cfg_path = sys.argv[2]
         prepare(DATA_ID, cfg_path)
-    prepare(DATA_ID)
+    else:
+        prepare(DATA_ID)
