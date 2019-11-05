@@ -7,7 +7,7 @@ import pdb
 def prepare(data_id, cfg_path='./config.yml'):
 
     cfg = io.load_yml(cfg_path, data_id)
-    data = io.load_csv(cfg['data_file'], cfg['delimiter'])
+    data = io.load_csv(cfg['data_file'])
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
     data = data[['text', cfg['label_col']]]

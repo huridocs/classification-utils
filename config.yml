@@ -3,7 +3,6 @@ UPR:
   pkl_file: 'gs://classification_data/UPR.pkl'
   label_col: 'Issue'
   text_col: 'Recommendation'
-  delimiter: ','
   sep: ','
 
 PlanInternational:
@@ -11,7 +10,6 @@ PlanInternational:
   pkl_file: 'gs://classification_data/PLAN.pkl'
   label_col: 'topics'
   text_col: 'Paragraph text'
-  delimiter: ','
   sep: ','
 
 PlanInternational_paragraphs:
@@ -19,7 +17,6 @@ PlanInternational_paragraphs:
   pkl_file: 'gs://classification_data/PLAN_paragraphs.pkl'
   label_col: 'label'
   text_col: 'text'
-  delimiter: ','
   sep: ','
 
 UHRI_themes:
@@ -27,7 +24,6 @@ UHRI_themes:
   pkl_file: 'gs://classification_data/UHRI_themes.pkl'
   label_col: 'themes'
   text_col: 'text'
-  delimiter: ','
   sep: '$'
 
 UHRI_affected_persons:
@@ -35,7 +31,6 @@ UHRI_affected_persons:
   pkl_file: 'gs://classification_data/UHRI_affected_persons.pkl'
   label_col: 'affected_persons'
   text_col: 'text'
-  delimiter: ','
   sep: '$'
 
 UHRI_sdgs:
@@ -43,5 +38,4 @@ UHRI_sdgs:
   pkl_file: 'gs://classification_data/UHRI_sdgs.pkl'
   label_col: 'sdgs'
   text_col: 'text'
-  delimiter: ','
   sep: '$'
