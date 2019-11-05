@@ -1,6 +1,7 @@
 from utils import format_labels
 from utils import io
 import sys
+import pdb
 
 
 def prepare(data_id, cfg_path='./config.yml'):
@@ -10,6 +11,7 @@ def prepare(data_id, cfg_path='./config.yml'):
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
     data = data[['text', cfg['label_col']]]
+    data.dropna(inplace=True)
     data.drop_duplicates(inplace=True)
 
     data['seq_length'] = data.text.map(str.split).apply(len)
