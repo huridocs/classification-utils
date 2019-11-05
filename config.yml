@@ -21,3 +21,27 @@ PlanInternational_paragraphs:
   text_col: 'text'
   delimiter: ','
   sep: ','
+
+UHRI_themes:
+  data_file: 'gs://classification_data/UHRI.csv'
+  pkl_file: 'gs://classification_data/UHRI_themes.pkl'
+  label_col: 'themes'
+  text_col: 'text'
+  delimiter: ','
+  sep: '$'
+
+UHRI_affected_persons:
+  data_file: 'gs://classification_data/UHRI.csv'
+  pkl_file: 'gs://classification_data/UHRI_affected_persons.pkl'
+  label_col: 'affected_persons'
+  text_col: 'text'
+  delimiter: ','
+  sep: '$'
+
+UHRI_sdgs:
+  data_file: 'gs://classification_data/UHRI.csv'
+  pkl_file: 'gs://classification_data/UHRI_sdgs.pkl'
+  label_col: 'sdgs'
+  text_col: 'text'
+  delimiter: ','
+  sep: '$'
