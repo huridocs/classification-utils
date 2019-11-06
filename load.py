@@ -2,10 +2,8 @@ import prepare
 from utils import format_labels, io
 
 
-def load_data(DATA_ID):
-    cfg_path = './config.yml'
+def load_data(cfg_path, DATA_ID):
     cfg = io.load_yml(cfg_path, DATA_ID)
-
     try:
         data = io.load_pickle(cfg['pkl_file'])
     except:
