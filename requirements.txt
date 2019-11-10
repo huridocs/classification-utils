@@ -5,3 +5,4 @@ tensorflow-hub==0.5.0
 PyYAML==5.1.2
 pyyml==0.0.2
 gcsfs==0.3.1
+matplotlib==3.1.1
