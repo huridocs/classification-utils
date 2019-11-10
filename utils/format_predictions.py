@@ -1,4 +1,4 @@
-from format_labels import decode_onehot
+from utils.format_labels import decode_onehot
 import pandas as pd
 
 

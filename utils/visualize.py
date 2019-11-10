@@ -1,4 +1,4 @@
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 
 def bar_plot(label, frequencies, log=False, title=''):
@@ -8,4 +8,5 @@ def bar_plot(label, frequencies, log=False, title=''):
     plt.xlabel('Categories')
     plt.ylabel('Frequency')
     plt.title(title)
+    plt.show()
 

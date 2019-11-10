@@ -12,7 +12,8 @@ import os
 import pprint
 import tensorflow as tf
 import pandas as pd
-from utils import io, format_labels, input_features
+from utils import io, format_labels, input_features, format_predictions, evaluate
+from utils.analysis import plot_category_distribution
 
 DATA_ID = 'PLAN'
 DATA_ID = 'UPR'
@@ -40,7 +41,9 @@ import pdb
 cfg = io.load_yml('./config.yml', DATA_ID)
 data = io.load_pickle(cfg['pkl_file'])
 
-all_labels = format_labels.get_unique_labels(data.label.tolist())
+plot_category_distribution(data)
+
+all_labels = format_labels.get_unique(data.label.tolist())
 tokenizer = classifier_with_tfhub.create_tokenizer_from_hub_module(BERT_MODEL_HUB)
 
 train_values = data.sample(frac=0.7, random_state=72)[:100]

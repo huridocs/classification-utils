@@ -1,5 +1,5 @@
 from collections import Counter
-from visualize import bar_plot
+from utils.visualize import bar_plot
 
 
 def category_distribution(data):
