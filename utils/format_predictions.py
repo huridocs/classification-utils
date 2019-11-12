@@ -24,7 +24,7 @@ def format_predictions(data, results, labels, threshold=0.5):
 
 def sample(data, max_T=2, max_F=4):
     Ts = data[data['pred_res'] == 'T']
-    Fs = data[data['pred_fes'] == 'F']
+    Fs = data[data['pred_res'] == 'F']
     if len(Ts) > max_T:
         Ts = Ts.sample(max_T)
     if len(Fs) > max_F:
