@@ -14,7 +14,7 @@ def compute_metrics(confusion_matrices, categories):
     for ind, matrix in enumerate(confusion_matrices):
         evaluation[categories[ind]] = metrics_from_confusion_matrix(matrix)
     evaluation_df = pd.DataFrame.from_dict(evaluation).transpose()
-    evaluation_df.sort_values(['f1', 'pred', 'recall'], ascending=False, inplace=True)
+    evaluation_df.sort_values(['f1', 'prec', 'recall'], ascending=False, inplace=True)
     evaluation_df.loc['mean'] = evaluation_df.mean(axis=0)
     return evaluation_df
 
@@ -42,9 +42,9 @@ def prec_rec_fscore(tp, fp, fn):
     return precision, recall, f1
 
 def micro_average(eval_df):
-    tp = eval_df.tp.sum()
-    fp = eval_df.fp.sum()
-    fn = eval_df.fn.sum()
+    tp = eval_df['tp'].sum()
+    fp = eval_df['fp'].sum()
+    fn = eval_df['fn'].sum()
     prec, recall, f1 = prec_rec_fscore(tp, fp, fn)
     return {'f1': round(f1, 4), 'prec': round(prec, 4),
             'recall': round(recall, 4)}
