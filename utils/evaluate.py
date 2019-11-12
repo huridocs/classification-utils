@@ -9,7 +9,7 @@ def confusion_matrix(data):
     return multilabel_confusion_matrix(target, prediction)
 
 
-def metrics(confusion_matrices, categories):
+def compute_metrics(confusion_matrices, categories):
     evaluation = {}
     for ind, matrix in enumerate(confusion_matrices):
         evaluation[categories[ind]] = metrics_from_confusion_matrix(matrix)
@@ -21,14 +21,31 @@ def metrics(confusion_matrices, categories):
 
 def metrics_from_confusion_matrix(matrix):
     tn, fp, fn, tp = matrix.ravel()
-    precision = tp / (tp + fn)
-    recall = tp / (tp + fn)
-    f1 = 2 * ((precision * recall) / (precision + recall))
+    precision, recall, f1 = prec_rec_fscore(tp, fp, fn)
     return {'f1': round(f1, 4), 'prec': round(precision, 4), 'recall': round(recall, 4)}
 
 
-def evaluate(data):
+def evaluate(data, labels):
     confusion_matrices = confusion_matrix(data)
-    evaluation = metrics(confusion_matrices)
+    evaluation = compute_metrics(confusion_matrices, labels)
     return evaluation
+
+def f_score(precision, recall, b=1):
+    prec = np.array(precision)
+    rec = np.array(recall)
+    return (1 + b * b) * (prec * rec) / ((b * b * prec) + rec)
+
+def prec_rec_fscore(tp, fp, fn):
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1 = f_score(precision, recall)
+    return precision, recall, f1
+
+def micro_average(eval_df):
+    tp = eval_df.tp.sum()
+    fp = eval_df.fp.sum()
+    fn = eval_df.fn.sum()
+    prec, recall, f1 = prec_rec_fscore(tp, fp, fn)
+    return {'f1': round(f1, 4), 'prec': round(prec, 4),
+            'recall': round(recall, 4)}
 
