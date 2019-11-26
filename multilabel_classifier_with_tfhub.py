@@ -3,7 +3,8 @@ from utils import modeling, optimization
 
 
 def create_model(is_training, input_ids, input_mask, segment_ids,
-                 labels, num_labels, use_one_hot_embeddings, bert_config):
+                 labels, num_labels, use_one_hot_embeddings, bert_config,
+                 class_weights):
     """Creates a classification model."""
     tags = set()
     if is_training:
@@ -46,14 +47,19 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         labels = tf.cast(labels, tf.float32)
         tf.logging.info("num_labels:{};logits:{};labels:{}".format(num_labels, logits, labels))
         per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
-        loss = tf.reduce_mean(per_example_loss)
+        weights = tf.gather(class_weights, labels)
+        scaled_loss = tf.multiply(per_example_loss, weights)
+        loss = tf.reduce_mean(scaled_loss)
+
+        #loss = tf.reduce_mean(per_example_loss)
 
         return (loss, per_example_loss, logits, probabilities)
 
 
 def model_fn_builder(num_labels, learning_rate, num_train_steps,
                      num_warmup_steps, use_tpu,
-                     use_one_hot_embeddings, bert_config, init_checkpoint):
+                     use_one_hot_embeddings, bert_config, init_checkpoint,
+                     class_weights):
     """Returns `model_fn` closure for TPUEstimator."""
 
     def model_fn(features, labels, mode, params):  # pylint: disable=unused-argument
@@ -74,7 +80,7 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
 
         (total_loss, per_example_loss, logits, probabilities) = create_model(
             is_training, input_ids, input_mask, segment_ids, label_ids,
-            num_labels, use_one_hot_embeddings, bert_config)
+            num_labels, use_one_hot_embeddings, bert_config, class_weights)
 
         tvars = tf.trainable_variables()
         initialized_variable_names = {}
