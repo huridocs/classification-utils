@@ -47,7 +47,7 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         labels = tf.cast(labels, tf.float32)
         tf.logging.info("num_labels:{};logits:{};labels:{}".format(num_labels, logits, labels))
         per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
-        weights = tf.gather(class_weights, labels)
+        weights = tf.gather(class_weights, tf.constant(labels))
         print('Per example loss: {}'.format(per_example_loss))
         print('Weights:{}'.format(weights))
         #scaled_loss = tf.multiply(per_example_loss, weights)
