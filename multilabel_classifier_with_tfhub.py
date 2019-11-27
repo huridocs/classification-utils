@@ -47,16 +47,14 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         labels = tf.cast(labels, tf.float32)
         tf.logging.info("num_labels:{};logits:{};labels:{}".format(num_labels, logits, labels))
         per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
-        weights = tf.gather(class_weights, tf.constant(labels))
-        print('Per example loss: {}'.format(per_example_loss))
-        print('Weights:{}'.format(weights))
-        #scaled_loss = tf.multiply(per_example_loss, weights)
-        scaled_loss = per_example_loss * weights
-        print('Scaled loss: {}'.format(scaled_loss))
-        loss = tf.reduce_mean(scaled_loss)
-
-        print('loss: {}'.format(loss))
-        #loss = tf.reduce_mean(per_example_loss)
+        if class_weights:
+            weights = tf.constant(class_weights)
+            weighted_loss = tf.muliply(per_example_loss, weights)
+            loss = tf.reduce_mean(weighted_loss)
+            tf.logging.info("weights:{}\nper_example_loss: {}\nweighted_loss:{}".format(weights, per_example_loss, weighted_loss))
+        else:
+            loss = tf.reduce_mean(per_example_loss)
+            tf.logging.info("loss:{}".format(loss))
 
         return (loss, per_example_loss, logits, probabilities)
 
@@ -64,7 +62,7 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
 def model_fn_builder(num_labels, learning_rate, num_train_steps,
                      num_warmup_steps, use_tpu,
                      use_one_hot_embeddings, bert_config, init_checkpoint,
-                     class_weights):
+                     class_weights=None):
     """Returns `model_fn` closure for TPUEstimator."""
 
     def model_fn(features, labels, mode, params):  # pylint: disable=unused-argument
