@@ -49,7 +49,7 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
         if class_weights:
             weights = tf.constant(class_weights)
-            weighted_loss = tf.muliply(per_example_loss, weights)
+            weighted_loss = tf.multiply(per_example_loss, weights)
             loss = tf.reduce_mean(weighted_loss)
             tf.logging.info("weights:{}\nper_example_loss: {}\nweighted_loss:{}".format(weights, per_example_loss, weighted_loss))
         else:
