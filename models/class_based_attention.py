@@ -1,14 +1,5 @@
-# Warmup is a period of time where hte learning rate 
-# is small and gradually increases--usually helps training.
-WARMUP_PROPORTION = 0.0
-DROPOUT = 0.1
-SHARED_SIZE = 0
-
-def model_fn_builder(num_classes, learning_rate, num_train_steps, use_tpu):
+def model_fn_builder(use_tpu):
   """Returns `model_fn` closure for TPUEstimator."""
-
-  # Compute number of train and warmup steps
-  num_warmup_steps = int(num_train_steps * WARMUP_PROPORTION)
 
   def model_fn(features, labels, mode, params):
     """The `model_fn` for TPUEstimator."""
@@ -27,11 +18,13 @@ def model_fn_builder(num_classes, learning_rate, num_train_steps, use_tpu):
     if "embeddings" not in features:
       input_ids = features["input_ids"]
       segment_ids = features["segment_ids"]
-      bert_module = hub.Module(BERT_MODEL_HUB, tags=tags, trainable=False)
+      bert_module = hub.Module(params["bert_model_hub"],
+                               tags=tags,
+                               trainable=params["trainable_bert"])
       bert_inputs = dict(input_ids=input_ids, input_mask=input_mask,
-                        segment_ids=segment_ids)
+                         segment_ids=segment_ids)
       bert_outputs = bert_module(inputs=bert_inputs, signature="tokens",
-                                as_dict=True)
+                                 as_dict=True)
       sequence_output = bert_outputs['sequence_output']
       predictions["sequence_output"] = sequence_output
     else:
@@ -39,12 +32,12 @@ def model_fn_builder(num_classes, learning_rate, num_train_steps, use_tpu):
 
     hidden_size = sequence_output.shape[-1].value
     shared_query_embedding = tf.get_variable(
-        'shared_query', [1, 1, SHARED_SIZE],
+        'shared_query', [1, 1, params["shared_size"]],
         initializer=tf.truncated_normal_initializer(stddev=0.02))
     shared_query_embedding = tf.broadcast_to(
-        shared_query_embedding, [1, num_classes, SHARED_SIZE])
+        shared_query_embedding, [1, params["num_classes"], params["shared_size"]])
     class_query_embedding = tf.get_variable(
-        'class_query', [1, num_classes, hidden_size-SHARED_SIZE],
+        'class_query', [1, params["num_classes"], hidden_size-params["shared_size"]],
         initializer=tf.truncated_normal_initializer(stddev=0.02))
     query_embedding = tf.concat([shared_query_embedding,
                                  class_query_embedding], axis=2)
@@ -56,9 +49,9 @@ def model_fn_builder(num_classes, learning_rate, num_train_steps, use_tpu):
     pooled_output = tf.matmul(distribution, sequence_output)
    
     if mode == tf.estimator.ModeKeys.TRAIN:
-      pooled_output = tf.nn.dropout(pooled_output, rate=DROPOUT)
+      pooled_output = tf.nn.dropout(pooled_output, rate=params["dropout"])
 
-    logits = tf.layers.dense(pooled_output, num_classes)
+    logits = tf.layers.dense(pooled_output, params["num_classes"])
     logits = tf.matrix_diag_part(logits)
 
     # probabilities = tf.nn.softmax(logits, axis=-1)  # single-label case
@@ -72,8 +65,9 @@ def model_fn_builder(num_classes, learning_rate, num_train_steps, use_tpu):
             labels=label_ids, logits=logits)
         loss = tf.reduce_mean(per_example_loss)
     if mode == tf.estimator.ModeKeys.TRAIN:
+      num_warmup_steps = int(params["num_train_steps"] * params["warmup_proportion"])
       train_op = optimization.create_optimizer(
-        loss, learning_rate, num_train_steps, num_warmup_steps, use_tpu)
+        loss, params["learning_rate"], params["num_train_steps"], num_warmup_steps, use_tpu)
       output_spec = tf.contrib.tpu.TPUEstimatorSpec(mode=mode, loss=loss,
                                                     train_op=train_op)
     elif mode == tf.estimator.ModeKeys.EVAL:
