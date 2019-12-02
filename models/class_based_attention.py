@@ -1,3 +1,11 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import tensorflow as tf
+import tensorflow_hub as hub
+from utils import optimization
+
 def model_fn_builder(use_tpu):
   """Returns `model_fn` closure for TPUEstimator."""
 
