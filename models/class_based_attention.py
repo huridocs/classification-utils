@@ -1,7 +1,7 @@
 # Warmup is a period of time where hte learning rate 
 # is small and gradually increases--usually helps training.
 WARMUP_PROPORTION = 0.0
-DROPOUT
+DROPOUT = 0.1
 SHARED_SIZE = 0
 
 def model_fn_builder(num_classes, learning_rate, num_train_steps, use_tpu):
