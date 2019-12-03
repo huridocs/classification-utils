@@ -38,8 +38,8 @@ def model_fn_builder(use_tpu):
     else:
       sequence_output = features["embeddings"]
 
+    hidden_size = sequence_output.shape[-1].value
     if params["class_based_attention"]:
-      hidden_size = sequence_output.shape[-1].value
       shared_query_embedding = tf.get_variable(
           'shared_query', [1, 1, params["shared_size"]],
           initializer=tf.truncated_normal_initializer(stddev=0.02))
@@ -57,7 +57,11 @@ def model_fn_builder(use_tpu):
       distribution = tf.nn.softmax(scores)
       pooled_output = tf.matmul(distribution, sequence_output)
     else:
-      pooled_output = sequence_output[:, 0, :]
+      first_token_tensor = tf.squeeze(sequence_output[:, 0:1, :], axis=1)
+      pooled_output = tf.layers.dense(
+            first_token_tensor,
+            hidden_size,
+            activation=tf.tanh)
    
     if mode == tf.estimator.ModeKeys.TRAIN:
       pooled_output = tf.nn.dropout(pooled_output, rate=params["dropout"])
