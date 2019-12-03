@@ -38,23 +38,26 @@ def model_fn_builder(use_tpu):
     else:
       sequence_output = features["embeddings"]
 
-    hidden_size = sequence_output.shape[-1].value
-    shared_query_embedding = tf.get_variable(
-        'shared_query', [1, 1, params["shared_size"]],
-        initializer=tf.truncated_normal_initializer(stddev=0.02))
-    shared_query_embedding = tf.broadcast_to(
-        shared_query_embedding, [1, params["num_classes"], params["shared_size"]])
-    class_query_embedding = tf.get_variable(
-        'class_query', [1, params["num_classes"], hidden_size-params["shared_size"]],
-        initializer=tf.truncated_normal_initializer(stddev=0.02))
-    query_embedding = tf.concat([shared_query_embedding,
-                                 class_query_embedding], axis=2)
-    # Reimplement Attention layer to peek into weights.
-    scores = tf.matmul(query_embedding, sequence_output, transpose_b=True)
-    input_bias = tf.abs(input_mask - 1)
-    scores -= 1.e9 * tf.expand_dims(tf.cast(input_bias, tf.float32), axis=1)
-    distribution = tf.nn.softmax(scores)
-    pooled_output = tf.matmul(distribution, sequence_output)
+    if params["class_based_attention"]:
+      hidden_size = sequence_output.shape[-1].value
+      shared_query_embedding = tf.get_variable(
+          'shared_query', [1, 1, params["shared_size"]],
+          initializer=tf.truncated_normal_initializer(stddev=0.02))
+      shared_query_embedding = tf.broadcast_to(
+          shared_query_embedding, [1, params["num_classes"], params["shared_size"]])
+      class_query_embedding = tf.get_variable(
+          'class_query', [1, params["num_classes"], hidden_size-params["shared_size"]],
+          initializer=tf.truncated_normal_initializer(stddev=0.02))
+      query_embedding = tf.concat([shared_query_embedding,
+                                   class_query_embedding], axis=2)
+      # Reimplement Attention layer to peek into weights.
+      scores = tf.matmul(query_embedding, sequence_output, transpose_b=True)
+      input_bias = tf.abs(input_mask - 1)
+      scores -= 1.e9 * tf.expand_dims(tf.cast(input_bias, tf.float32), axis=1)
+      distribution = tf.nn.softmax(scores)
+      pooled_output = tf.matmul(distribution, sequence_output)
+    else:
+      pooled_output = sequence_output[:, 0, :]
    
     if mode == tf.estimator.ModeKeys.TRAIN:
       pooled_output = tf.nn.dropout(pooled_output, rate=params["dropout"])
