@@ -135,7 +135,6 @@ def model_fn_builder(use_tpu):
         mode=mode,
         loss=loss,
         train_op=train_op,
-        eval_metrics=eval_metrics,
         predictions=predictions)
 
   return model_fn
