@@ -80,9 +80,12 @@ def model_fn_builder(use_tpu):
             labels=label_ids, logits=logits)
         loss = tf.reduce_mean(per_example_loss)
     if mode == tf.estimator.ModeKeys.TRAIN:
-      num_warmup_steps = int(params["num_train_steps"] * params["warmup_proportion"])
       train_op = optimization.create_optimizer(
-        loss, params["learning_rate"], params["num_train_steps"], num_warmup_steps, use_tpu)
+        loss,
+        params["learning_rate"],
+        params["num_train_steps"],
+        params["num_warmup_steps"],
+        use_tpu)
       output_spec = tf.contrib.tpu.TPUEstimatorSpec(mode=mode, loss=loss,
                                                     train_op=train_op)
     elif mode == tf.estimator.ModeKeys.EVAL:
