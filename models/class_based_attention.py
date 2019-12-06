@@ -122,13 +122,20 @@ def model_fn_builder(use_tpu):
     predictions["probabilities"] = probabilities
     predictions["attention"] = distribution
     predictions["pooled_output"] = pooled_output
-      
-    output_spec = tf.contrib.tpu.TPUEstimatorSpec(
+    
+    if use_tpu:
+      return tf.contrib.tpu.TPUEstimatorSpec(
         mode=mode,
         loss=loss,
         train_op=train_op,
         eval_metrics=eval_metrics,
         predictions=predictions)
-    return output_spec
+    else:
+      return tf.estimator.EstimatorSpec(
+        mode=mode,
+        loss=loss,
+        train_op=train_op,
+        eval_metrics=eval_metrics,
+        predictions=predictions)
 
   return model_fn
