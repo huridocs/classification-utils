@@ -21,7 +21,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/huridocs/classification-utils',
     author='Huridocs',
-    packages=['models', 'utils'],
+    package_dir={'classification_utils': ''},
     install_requires=requirements,
     extras_require={},
     python_requires='>=3.6',
