@@ -9,4 +9,3 @@ def bar_plot(label, frequencies, log=False, title=''):
     plt.ylabel('Frequency')
     plt.title(title)
     plt.show()
-

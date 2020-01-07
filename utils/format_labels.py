@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 
 
@@ -11,7 +13,7 @@ def join(labels):
 
 
 def get_unique(labels):
-    all_labels = sum(labels, [])
+    all_labels: List[str] = sum(labels, [])
     all_labels.append('nan')
     return sorted(list(set(all_labels)))
 
@@ -22,6 +24,7 @@ def encode_onehot(label_list, unique_labels):
     for ind in indices:
         labels[ind] = 1
     return labels
+
 
 def decode_onehot(encoding, unique_labels):
     indices = np.where(np.array(encoding) == 1)[0].tolist()

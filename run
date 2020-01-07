@@ -25,10 +25,14 @@ fi
 
 . ./venv/bin/activate || exit -1
 
-PATHS='*.py utils/*.py'
+PATHS='*.py utils/*.py models/*.py'
 
 if [ $CMD = "format" ]; then
     yapf -i $PATHS "$@"
+elif [ $CMD = "lint" ]; then
+    mypy $PATHS &&
+        flake8 &&
+        (yapf -d $PATHS >/dev/null || (echo 'Format not happy, do ./run format!' && exit -1))
 else
     "$CMD" "$@"
 fi
