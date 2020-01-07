@@ -14,7 +14,7 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setup(
-    name='huridocs-classification-utils',
+    name='classification-utils',
     version=0.1,
     description='Classifications utils',
     long_description=long_description,
