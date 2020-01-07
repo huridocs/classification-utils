@@ -10,6 +10,9 @@ with open(os.path.join(this_directory, 'README.md')) as f:
 
 sys.path.insert(0, this_directory)
 
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
 setup(
     name='huridocs-classification-utils',
     version=0.1,
@@ -19,7 +22,7 @@ setup(
     url='https://github.com/huridocs/classification-utils',
     author='Huridocs',
     packages=find_packages(),
-    install_requires=[],
+    install_requires=requirements,
     extras_require={},
     python_requires='>=3.6',
     entry_points={},
