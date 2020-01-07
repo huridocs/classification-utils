@@ -128,9 +128,9 @@ model_train(estimator_from_tfhub)
 def model_predict(estimator):
     # Make predictions on a subset of eval examples
     prediction_examples = input_features.create_examples(test_values, 'test')
-    input_features = classifier.convert_examples_to_features(
+    input_features2 = classifier.convert_examples_to_features(
         prediction_examples, all_labels, MAX_SEQ_LENGTH, tokenizer)
-    predict_input_fn = classifier.input_fn_builder(features=input_features,
+    predict_input_fn = classifier.input_fn_builder(features=input_features2,
                                                    seq_length=MAX_SEQ_LENGTH,
                                                    is_training=False,
                                                    drop_remainder=False)

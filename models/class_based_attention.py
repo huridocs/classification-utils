@@ -91,9 +91,6 @@ def model_fn_builder(use_tpu):
                                                      params["num_train_steps"],
                                                      params["num_warmup_steps"],
                                                      use_tpu)
-            output_spec = tf.contrib.tpu.TPUEstimatorSpec(mode=mode,
-                                                          loss=loss,
-                                                          train_op=train_op)
         elif mode == tf.estimator.ModeKeys.EVAL:
 
             def _f1_score(labels, pred):
