@@ -2,7 +2,7 @@
 import os.path
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md')) as f:
@@ -21,7 +21,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/huridocs/classification-utils',
     author='Huridocs',
-    packages=find_packages(),
+    packages=['models', 'utils'],
     install_requires=requirements,
     extras_require={},
     python_requires='>=3.6',
