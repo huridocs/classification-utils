@@ -26,6 +26,13 @@ PlanInternational_paragraphs:
   text_col: 'text'
   sep: ','
 
+PlanInternational_themes_200:
+  data_file: 'gs://classification_data/PlanInternational_themes_200.csv'
+  pkl_file: 'gs://classification_data/PLAN_themes_200.pkl'
+  label_col: 'label'
+  text_col: 'text'
+  sep: ','
+
 UHRI_themes:
   data_file: 'gs://classification_data/UHRI.csv'
   pkl_file: 'gs://classification_data/UHRI_themes.pkl'

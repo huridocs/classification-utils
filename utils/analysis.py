@@ -2,8 +2,8 @@ from collections import Counter
 from utils.visualize import bar_plot
 
 
-def category_distribution(data):
-    all_assigned_labels = sum(data['label'].tolist(), [])
+def category_distribution(data, col='label'):
+    all_assigned_labels = sum(data[col].tolist(), [])
     return Counter(all_assigned_labels)
 
 def plot_category_distribution(data, title='', log=False):
