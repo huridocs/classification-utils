@@ -1,0 +1,38 @@
+#!/bin/bash
+
+P3=
+if [[ -f $(which python3.7) ]]; then
+    P3=3.7
+else
+    echo "WARNING: Could not find python 3.7 in path. You probable want to 'sudo apt install python3.7-venv'."
+fi
+
+CMD=$1
+shift
+
+if [ $CMD = "install" ]; then
+    python${P3} -m venv venv
+    . ./venv/bin/activate
+    pip install --upgrade pip || echo "Please first sudo apt install python${P3}-pip"
+    pip install --upgrade setuptools
+    pip install --upgrade -r requirements.txt
+    exit 0
+fi
+
+if [ ! -f "venv/bin/activate" ]; then
+    ./run install
+fi
+
+. ./venv/bin/activate || exit -1
+
+PATHS='*.py utils/*.py models/*.py'
+
+if [ $CMD = "format" ]; then
+    yapf -i $PATHS "$@"
+elif [ $CMD = "lint" ]; then
+    mypy $PATHS &&
+        flake8 &&
+        (yapf -d $PATHS >/dev/null || (echo 'Format not happy, do ./run format!' && exit -1))
+else
+    "$CMD" "$@"
+fi

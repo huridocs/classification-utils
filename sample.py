@@ -10,8 +10,8 @@ def sample_data(data, labels, MAX_N, random_state=None):
                                                    random_state=random_state)
             samples.append(category_sample)
         else:
-            samples.append(category_data.sample(MAX_N,
-                                                random_state=random_state))
+            samples.append(
+                category_data.sample(MAX_N, random_state=random_state))
     samples_df = pd.concat(samples)
     samples_df.drop_duplicates(subset=['text', 'str_label'], inplace=True)
     return samples_df

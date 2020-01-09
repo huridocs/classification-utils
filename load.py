@@ -15,8 +15,3 @@ def load_data(cfg_path, DATA_ID):
 
 def load_unique_labels(data):
     return format_labels.get_unique(data.label.tolist())
-
-
-
-
-

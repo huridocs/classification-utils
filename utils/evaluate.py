@@ -19,8 +19,14 @@ def compute_metrics(confusion_matrices, categories):
 def metrics_from_confusion_matrix(matrix):
     tn, fp, fn, tp = matrix.ravel()
     precision, recall, f1 = prec_rec_fscore(tp, fp, fn)
-    return {'f1': round(f1, 4), 'prec': round(precision, 4), 'recall':
-            round(recall, 4), 'tp': tp, 'fp': fp, 'fn': fn}
+    return {
+        'f1': round(f1, 4),
+        'prec': round(precision, 4),
+        'recall': round(recall, 4),
+        'tp': tp,
+        'fp': fp,
+        'fn': fn
+    }
 
 
 def evaluate(data, labels):
@@ -29,7 +35,8 @@ def evaluate(data, labels):
     micro_avg = micro_average(evaluation)
     evaluation = evaluation.append(pd.DataFrame(micro_avg, index=['micro_avg']))
     evaluation.loc['macro_avg'] = evaluation.mean(axis=0)
-    return evaluation.reindex(columns=['f1', 'prec', 'recall', 'tp', 'fp', 'fn'])
+    return evaluation.reindex(
+        columns=['f1', 'prec', 'recall', 'tp', 'fp', 'fn'])
 
 
 def f_score(precision, recall, b=1):
@@ -37,17 +44,21 @@ def f_score(precision, recall, b=1):
     rec = np.array(recall)
     return (1 + b * b) * (prec * rec) / ((b * b * prec) + rec)
 
+
 def prec_rec_fscore(tp, fp, fn):
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
     f1 = f_score(precision, recall)
     return precision, recall, f1
 
+
 def micro_average(eval_df):
     tp = eval_df['tp'].sum()
     fp = eval_df['fp'].sum()
     fn = eval_df['fn'].sum()
     prec, recall, f1 = prec_rec_fscore(tp, fp, fn)
-    return {'f1': round(f1, 4), 'prec': round(prec, 4),
-            'recall': round(recall, 4)}
-
+    return {
+        'f1': round(f1, 4),
+        'prec': round(prec, 4),
+        'recall': round(recall, 4)
+    }

@@ -1,2 +1,5 @@
 # local config file
 config_local.yml
+.mypy_cache
+/venv
+**/__pycache__

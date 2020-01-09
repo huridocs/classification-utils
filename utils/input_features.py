@@ -14,7 +14,12 @@ class InputExample(object):
 
 class InputFeatures(object):
 
-    def __init__(self, input_ids, input_mask, segment_ids, label_ids, is_real_example=True):
+    def __init__(self,
+                 input_ids,
+                 input_mask,
+                 segment_ids,
+                 label_ids,
+                 is_real_example=True):
         self.input_ids = input_ids
         self.input_mask = input_mask
         self.segment_ids = segment_ids
@@ -47,7 +52,7 @@ def create_examples(data, nr_labels=None, set_type='train', mode='multilabel'):
     return examples
 
 
-def convert_examples_to_features(examples,  max_seq_length, tokenizer):
+def convert_examples_to_features(examples, max_seq_length, tokenizer):
     """Loads a data file into a list of `InputBatch`s."""
 
     features = []
@@ -125,10 +130,10 @@ def convert_examples_to_features(examples,  max_seq_length, tokenizer):
             # logger.info("label: %s (id = %s)" % (example.labels, labels_ids))
 
         features.append(
-                InputFeatures(input_ids=input_ids,
-                              input_mask=input_mask,
-                              segment_ids=segment_ids,
-                              label_ids=labels_ids))
+            InputFeatures(input_ids=input_ids,
+                          input_mask=input_mask,
+                          segment_ids=segment_ids,
+                          label_ids=labels_ids))
     return features
 
 
@@ -143,17 +148,15 @@ class PaddingInputExample(object):
     """
 
 
-def convert_single_example(ex_index, example, max_seq_length,
-                           tokenizer):
+def convert_single_example(ex_index, example, max_seq_length, tokenizer):
     """Converts a single `InputExample` into a single `InputFeatures`."""
 
     if isinstance(example, PaddingInputExample):
-        return InputFeatures(
-            input_ids=[0] * max_seq_length,
-            input_mask=[0] * max_seq_length,
-            segment_ids=[0] * max_seq_length,
-            label_ids=0,
-            is_real_example=False)
+        return InputFeatures(input_ids=[0] * max_seq_length,
+                             input_mask=[0] * max_seq_length,
+                             segment_ids=[0] * max_seq_length,
+                             label_ids=0,
+                             is_real_example=False)
 
     tokens_a = tokenizer.tokenize(example.text_a)
     tokens_b = None
@@ -225,30 +228,30 @@ def convert_single_example(ex_index, example, max_seq_length,
     for label in example.label:
         labels_ids.append(int(label))
 
-    feature = InputFeatures(
-        input_ids=input_ids,
-        input_mask=input_mask,
-        segment_ids=segment_ids,
-        label_ids=labels_ids,
-        is_real_example=True)
+    feature = InputFeatures(input_ids=input_ids,
+                            input_mask=input_mask,
+                            segment_ids=segment_ids,
+                            label_ids=labels_ids,
+                            is_real_example=True)
     return feature
 
 
-def file_based_convert_examples_to_features(
-        examples, max_seq_length, tokenizer, output_file):
+def file_based_convert_examples_to_features(examples, max_seq_length, tokenizer,
+                                            output_file):
     """Convert a set of `InputExample`s to a TFRecord file."""
 
     writer = tf.python_io.TFRecordWriter(output_file)
 
     for (ex_index, example) in enumerate(examples):
         #if ex_index % 10000 == 0:
-            #tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
+        #tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
 
-        feature = convert_single_example(ex_index, example,
-                                         max_seq_length, tokenizer)
+        feature = convert_single_example(ex_index, example, max_seq_length,
+                                         tokenizer)
 
         def create_int_feature(values):
-            f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+            f = tf.train.Feature(int64_list=tf.train.Int64List(
+                value=list(values)))
             return f
 
         features = collections.OrderedDict()
@@ -263,7 +266,8 @@ def file_based_convert_examples_to_features(
             label_ids = feature.label_ids[0]
         features["label_ids"] = create_int_feature(label_ids)
 
-        tf_example = tf.train.Example(features=tf.train.Features(feature=features))
+        tf_example = tf.train.Example(features=tf.train.Features(
+            feature=features))
         writer.write(tf_example.SerializeToString())
     writer.close()
 
