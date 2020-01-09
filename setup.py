@@ -21,8 +21,11 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/huridocs/classification-utils',
     author='Huridocs',
-    packages=['classification_utils.models', 'classification_utils.utils'],
-    package_dir={'classification_utils': ''},
+    packages=['models', 'utils'],
+    # This would reduce pollution of the root python namespace, but
+    # then relative imports in this code don't work...
+    # packages=['classification_utils.models', 'classification_utils.utils'],
+    # package_dir={'classification_utils': ''},
     install_requires=requirements,
     extras_require={},
     python_requires='>=3.6',
