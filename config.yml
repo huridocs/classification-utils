@@ -5,6 +5,13 @@ UPR:
   text_col: 'Recommendation'
   sep: ','
 
+UPR_action:
+  data_file: 'gs://classification_data/UPR.csv'
+  pkl_file: 'gs://classification_data/UPR_action.pkl'
+  label_col: 'Action'
+  text_col: 'Recommendation'
+  sep: ','
+
 PlanInternational_themes:
   data_file: 'gs://classification_data/PlanInternational_themes.csv'
   pkl_file: 'gs://classification_data/PLAN_themes.pkl'
