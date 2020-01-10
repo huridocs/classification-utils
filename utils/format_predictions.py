@@ -15,10 +15,14 @@ def get_prediction(scores, thres=0.5):
 def format_predictions(data, results, labels, threshold=0.5):
     data = data[:len(results)]
     data['pred_prob_all'] = [list(probabilities) for probabilities in results]
-    data['pred_one_hot_label'] = [get_prediction(probabilities, threshold) for
-                                  probabilities in results]
-    data['pred_label'] = data['pred_one_hot_label'].apply(decode_onehot, args=[labels])
-    data['pred_prob'] = data.apply(lambda x: sorted(x.pred_prob_all, reverse=True)[:len(x.pred_label)], axis=1)
+    data['pred_one_hot_label'] = [
+        get_prediction(probabilities, threshold) for probabilities in results
+    ]
+    data['pred_label'] = data['pred_one_hot_label'].apply(decode_onehot,
+                                                          args=[labels])
+    data['pred_prob'] = data.apply(
+        lambda x: sorted(x.pred_prob_all, reverse=True)[:len(x.pred_label)],
+        axis=1)
     return data
 
 

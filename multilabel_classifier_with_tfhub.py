@@ -2,8 +2,8 @@ import tensorflow as tf
 from utils import modeling, optimization
 
 
-def create_model(is_training, input_ids, input_mask, segment_ids,
-                 labels, num_labels, use_one_hot_embeddings, bert_config,
+def create_model(is_training, input_ids, input_mask, segment_ids, labels,
+                 num_labels, use_one_hot_embeddings, bert_config,
                  class_weights):
     """Creates a classification model."""
     tags = set()
@@ -30,8 +30,8 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         "output_weights", [num_labels, hidden_size],
         initializer=tf.truncated_normal_initializer(stddev=0.02))
 
-    output_bias = tf.get_variable(
-        "output_bias", [num_labels], initializer=tf.zeros_initializer())
+    output_bias = tf.get_variable("output_bias", [num_labels],
+                                  initializer=tf.zeros_initializer())
 
     with tf.variable_scope("loss"):
         if is_training:
@@ -45,13 +45,17 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         probabilities = tf.nn.sigmoid(logits)
 
         labels = tf.cast(labels, tf.float32)
-        tf.logging.info("num_labels:{};logits:{};labels:{}".format(num_labels, logits, labels))
-        per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
+        tf.logging.info("num_labels:{};logits:{};labels:{}".format(
+            num_labels, logits, labels))
+        per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(
+            labels=labels, logits=logits)
         if class_weights:
             weights = tf.constant(class_weights)
             weighted_loss = tf.multiply(per_example_loss, weights)
             loss = tf.reduce_mean(weighted_loss)
-            tf.logging.info("weights:{}\nper_example_loss: {}\nweighted_loss:{}".format(weights, per_example_loss, weighted_loss))
+            tf.logging.info(
+                "weights:{}\nper_example_loss: {}\nweighted_loss:{}".format(
+                    weights, per_example_loss, weighted_loss))
         else:
             loss = tf.reduce_mean(per_example_loss)
             tf.logging.info("loss:{}".format(loss))
@@ -59,9 +63,14 @@ def create_model(is_training, input_ids, input_mask, segment_ids,
         return (loss, per_example_loss, logits, probabilities)
 
 
-def model_fn_builder(num_labels, learning_rate, num_train_steps,
-                     num_warmup_steps, use_tpu,
-                     use_one_hot_embeddings, bert_config, init_checkpoint,
+def model_fn_builder(num_labels,
+                     learning_rate,
+                     num_train_steps,
+                     num_warmup_steps,
+                     use_tpu,
+                     use_one_hot_embeddings,
+                     bert_config,
+                     init_checkpoint,
                      class_weights=None):
     """Returns `model_fn` closure for TPUEstimator."""
 
@@ -75,7 +84,8 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
 
         is_real_example = None
         if "is_real_example" in features:
-            is_real_example = tf.cast(features["is_real_example"], dtype=tf.float32)
+            is_real_example = tf.cast(features["is_real_example"],
+                                      dtype=tf.float32)
         else:
             is_real_example = tf.ones(tf.shape(label_ids), dtype=tf.float32)
 
@@ -90,12 +100,15 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
         scaffold_fn = None
 
         if init_checkpoint:
-            (assignment_map, initialized_variable_names) = modeling.get_assignment_map_from_checkpoint(tvars, init_checkpoint)
+            (assignment_map, initialized_variable_names
+             ) = modeling.get_assignment_map_from_checkpoint(
+                 tvars, init_checkpoint)
 
             if use_tpu:
 
                 def tpu_scaffold():
-                    tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
+                    tf.train.init_from_checkpoint(init_checkpoint,
+                                                  assignment_map)
                     return tf.train.Scaffold()
 
                 scaffold_fn = tpu_scaffold
@@ -108,19 +121,24 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
             init_string = ""
             if var.name in initialized_variable_names:
                 init_string = ", *INIT_FROM_CKPT*"
-            tf.logging.info("  name = %s, shape = %s%s", var.name, var.shape, init_string)
+            tf.logging.info("  name = %s, shape = %s%s", var.name, var.shape,
+                            init_string)
 
         output_spec = None
         if mode == tf.estimator.ModeKeys.TRAIN:
 
-            train_op = optimization.create_optimizer(
-                total_loss, learning_rate, num_train_steps, num_warmup_steps, use_tpu)
+            train_op = optimization.create_optimizer(total_loss, learning_rate,
+                                                     num_train_steps,
+                                                     num_warmup_steps, use_tpu)
 
-            output_spec = tf.contrib.tpu.TPUEstimatorSpec(mode=mode, loss=total_loss, train_op=train_op)
+            output_spec = tf.contrib.tpu.TPUEstimatorSpec(mode=mode,
+                                                          loss=total_loss,
+                                                          train_op=train_op)
 
         elif mode == tf.estimator.ModeKeys.EVAL:
 
-            def metric_fn(per_example_loss, label_ids, probabilities, is_real_example):
+            def metric_fn(per_example_loss, label_ids, probabilities,
+                          is_real_example):
 
                 logits_split = tf.split(probabilities, num_labels, axis=-1)
                 label_ids_split = tf.split(label_ids, num_labels, axis=-1)
@@ -128,12 +146,15 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
                 eval_dict = {}
                 for j, logits in enumerate(logits_split):
                     label_id_ = tf.cast(label_ids_split[j], dtype=tf.int32)
-                    current_auc, update_op_auc = tf.metrics.auc(label_id_, logits)
+                    current_auc, update_op_auc = tf.metrics.auc(
+                        label_id_, logits)
                     eval_dict[str(j)] = (current_auc, update_op_auc)
-                eval_dict['eval_loss'] = tf.metrics.mean(values=per_example_loss)
+                eval_dict['eval_loss'] = tf.metrics.mean(
+                    values=per_example_loss)
                 return eval_dict
 
-            eval_metrics = metric_fn(per_example_loss, label_ids, probabilities, is_real_example)
+            eval_metrics = metric_fn(per_example_loss, label_ids, probabilities,
+                                     is_real_example)
             output_spec = tf.estimator.EstimatorSpec(
                 mode=mode,
                 loss=total_loss,
@@ -141,7 +162,8 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
                 scaffold=scaffold_fn)
         else:
             print("mode:", mode, "probabilities:", probabilities)
-            output_spec = tf.contrib.tpu.TPUEstimatorSpec(mode=mode, predictions={"probabilities": probabilities})
+            output_spec = tf.contrib.tpu.TPUEstimatorSpec(
+                mode=mode, predictions={"probabilities": probabilities})
         return output_spec
 
     return model_fn
@@ -173,26 +195,27 @@ def input_fn_builder(features, seq_length, is_training, drop_remainder):
         # TFRecordReader.
         d = tf.data.Dataset.from_tensor_slices({
             "input_ids":
-                tf.constant(
-                    all_input_ids, shape=[num_examples, seq_length],
-                    dtype=tf.int32),
+                tf.constant(all_input_ids,
+                            shape=[num_examples, seq_length],
+                            dtype=tf.int32),
             "input_mask":
-                tf.constant(
-                    all_input_mask,
-                    shape=[num_examples, seq_length],
-                    dtype=tf.int32),
+                tf.constant(all_input_mask,
+                            shape=[num_examples, seq_length],
+                            dtype=tf.int32),
             "segment_ids":
-                tf.constant(
-                    all_segment_ids,
-                    shape=[num_examples, seq_length],
-                    dtype=tf.int32),
+                tf.constant(all_segment_ids,
+                            shape=[num_examples, seq_length],
+                            dtype=tf.int32),
             "label_ids":
-                tf.constant(all_label_ids, shape=[num_examples, len(all_label_ids[0])], dtype=tf.int32),
+                tf.constant(all_label_ids,
+                            shape=[num_examples,
+                                   len(all_label_ids[0])],
+                            dtype=tf.int32),
         })
 
         if is_training:
-          d = d.repeat()
-          d = d.shuffle(buffer_size=100)
+            d = d.repeat()
+            d = d.shuffle(buffer_size=100)
 
         d = d.batch(batch_size=batch_size, drop_remainder=drop_remainder)
         return d
