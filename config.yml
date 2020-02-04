@@ -12,6 +12,13 @@ UPR_action:
   text_col: 'Recommendation'
   sep: ','
 
+PlanInternational_themes_update:
+  data_file: 'gs://classification_data/PlanInternational_themes_joint_data.csv'
+  pkl_file: 'gs://classification_data/PlanInternational_themes_joint_data.pkl'
+  label_col: 'label'
+  text_col: 'text'
+  sep: ','
+
 PlanInternational_themes:
   data_file: 'gs://classification_data/PlanInternational_themes.csv'
   pkl_file: 'gs://classification_data/PLAN_themes.pkl'
