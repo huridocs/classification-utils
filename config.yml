@@ -33,6 +33,13 @@ PlanInternational_persons:
   text_col: 'paragraph text'
   sep: ','
 
+PlanInternational_persons_update:
+  data_file: 'gs://classification_data/PlanInternational_affected_persons_joint_data.csv'
+  pkl_file: 'gs://classification_data/PLAN_affected_persons_joint_data.pkl'
+  label_col: 'label'
+  text_col: 'text'
+  sep: ','
+
 PlanInternational_paragraphs:
   data_file: 'gs://classification_data/PlanInternational_paragraphs.csv'
   pkl_file: 'gs://classification_data/PLAN_paragraphs.pkl'
