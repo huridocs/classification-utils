@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
+import tensorflow_hub as hub
 
-from utils import optimization, modeling
+from utils import optimization
 
 
 def model_fn_builder(use_tpu):
@@ -25,50 +26,20 @@ def model_fn_builder(use_tpu):
         if "embeddings" not in features:
             input_ids = features["input_ids"]
             segment_ids = features["segment_ids"]
-
-            # TODO: Check is_training === trainable Bert j?
-            model = modeling.BertModel(config=params['bert_config'],
-                                       is_training=params['trainable_bert'],
-                                       input_ids=input_ids,
-                                       input_mask=input_mask,
-                                       token_type_ids=segment_ids,
-                                       use_one_hot_embeddings=True)
-
-            sequence_output = model.get_sequence_output()
-
+            bert_module = hub.Module(params["bert_model_hub"],
+                                     tags=tags,
+                                     trainable=params["trainable_bert"])
+            bert_inputs = dict(input_ids=input_ids,
+                               input_mask=input_mask,
+                               segment_ids=segment_ids)
+            bert_outputs = bert_module(inputs=bert_inputs,
+                                       signature="tokens",
+                                       as_dict=True)
+            sequence_output = bert_outputs['sequence_output']
             predictions["sequence_output"] = sequence_output
         else:
             sequence_output = features["embeddings"]
 
-        # TODO: Find correct place
-        tvars = tf.trainable_variables()
-        initialized_variable_names = {}
-        # TODO: Is scaffold needed?
-        scaffold_fn = None
-        if params["init_checkpoint"]:
-            (assignment_map, initialized_variable_names
-             ) = modeling.get_assignment_map_from_checkpoint(
-                 tvars, params["init_checkpoint"])
-            if use_tpu:
-
-                def tpu_scaffold():
-                    tf.train.init_from_checkpoint(params["init_checkpoint"],
-                                                  assignment_map)
-                    return tf.train.Scaffold()
-
-                scaffold_fn = tpu_scaffold
-            else:
-                tf.train.init_from_checkpoint(params["init_checkpoint"], assignment_map)
-
-        tf.logging.info("**** Trainable Variables ****")
-        for var in tvars:
-            init_string = ""
-            if var.name in initialized_variable_names:
-                init_string = ", *INIT_FROM_CKPT*"
-            tf.logging.info("  name = %s, shape = %s%s", var.name, var.shape,
-                            init_string)
-
-        # - - - - -
         hidden_size = sequence_output.shape[-1].value
         if params["class_based_attention"]:
             shared_query_embedding = tf.get_variable(
@@ -167,14 +138,12 @@ def model_fn_builder(use_tpu):
             return tf.contrib.tpu.TPUEstimatorSpec(mode=mode,
                                                    loss=loss,
                                                    train_op=train_op,
-                                                   scaffold_fn=scaffold_fn,
                                                    eval_metrics=eval_metrics,
                                                    predictions=predictions)
         else:
             return tf.estimator.EstimatorSpec(mode=mode,
                                               loss=loss,
                                               train_op=train_op,
-                                              scaffold_fn=scaffold_fn,
                                               predictions=predictions)
 
     return model_fn
