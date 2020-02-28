@@ -21,7 +21,6 @@ import copy
 import json
 import math
 import re
-from typing import Dict
 
 import numpy as np
 import six
@@ -321,7 +320,7 @@ def get_activation(activation_string):
 
 def get_assignment_map_from_checkpoint(tvars, init_checkpoint):
     """Compute the union of the current variables and checkpoint variables."""
-    assignment_map: Dict[str, str] = {}
+    assignment_map = {}
     initialized_variable_names = {}
 
     name_to_variable = collections.OrderedDict()

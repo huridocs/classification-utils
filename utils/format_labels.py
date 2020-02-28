@@ -1,5 +1,3 @@
-from typing import List
-
 import numpy as np
 
 
@@ -13,7 +11,7 @@ def join(labels):
 
 
 def get_unique(labels):
-    all_labels: List[str] = sum(labels, [])
+    all_labels = sum(labels, [])
     all_labels.append('nan')
     return sorted(list(set(all_labels)))
 
