@@ -69,6 +69,7 @@ def model_fn_builder(use_tpu):
                             init_string)
 
         # - - - - -
+
         hidden_size = sequence_output.shape[-1].value
         if params["class_based_attention"]:
             shared_query_embedding = tf.get_variable(
@@ -174,7 +175,6 @@ def model_fn_builder(use_tpu):
             return tf.estimator.EstimatorSpec(mode=mode,
                                               loss=loss,
                                               train_op=train_op,
-                                              scaffold_fn=scaffold_fn,
                                               predictions=predictions)
 
     return model_fn
