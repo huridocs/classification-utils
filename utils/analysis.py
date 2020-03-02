@@ -1,5 +1,5 @@
 from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder
-from nlkt.metrics import BigramAssocMeasures, TrigramAssocMeasures
+from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
 from collections import Counter
 
 from utils.visualize import bar_plot
