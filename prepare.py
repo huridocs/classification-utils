@@ -10,7 +10,11 @@ def prepare(data_id, cfg_path='./config.yml'):
     data = io.load_csv(cfg['data_file'])
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
-    data = data[['text', cfg['label_col']]]
+    if 'retrieved' in data.columns:
+        data = data[['text', cfg['label_col'], 'retrieved']]
+    else:
+        data = data[['text', cfg['label_col']]]
+
     data.dropna(inplace=True)
     data.drop_duplicates(inplace=True)
 
@@ -23,6 +27,7 @@ def prepare(data_id, cfg_path='./config.yml'):
     unique_labels = format_labels.get_unique(data.label.tolist())
     data['one_hot_labels'] = data['label'].apply(format_labels.encode_onehot,
                                                  args=[unique_labels])
+
     io.to_pickle(data, cfg['pkl_file'])
 
 
