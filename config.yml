@@ -21,16 +21,16 @@ PlanInternational_themes_update:
 
 PlanInternational_themes:
   data_file: 'gs://classification_data/PlanInternational_themes.csv'
-  pkl_file: 'gs://classification_data/PLAN_themes.pkl'
-  label_col: 'topics'
-  text_col: 'Paragraph text'
+  pkl_file: 'gs://classification_data/PlanInternational_themes.pkl'
+  label_col: 'label'
+  text_col: 'text'
   sep: ','
 
 PlanInternational_persons:
   data_file: 'gs://classification_data/PlanInternational_affected_persons.csv'
-  pkl_file: 'gs://classification_data/PLAN_affected_persons.pkl'
-  label_col: 'affected_persons'
-  text_col: 'paragraph text'
+  pkl_file: 'gs://classification_data/PlanInternational_affected_persons.pkl'
+  label_col: 'label'
+  text_col: 'text'
   sep: ','
 
 PlanInternational_persons_update:
