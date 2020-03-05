@@ -10,12 +10,14 @@ def prepare(data_id, cfg_path='./config.yml'):
     data = io.load_csv(cfg['data_file'])
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
-    if 'retrieved' in data.columns:
-        data = data[['text', cfg['label_col'], 'retrieved']]
+
+    if 'add_col' in cfg.keys():
+        columns = cfg['add_col'] + ['text', cfg['label_col']]
+        data = data[columns]
     else:
         data = data[['text', cfg['label_col']]]
 
-    data.dropna(inplace=True)
+    data.dropna(subset=['text', cfg['label_col']], inplace=True)
     data.drop_duplicates(inplace=True)
 
     data['seq_length'] = data.text.map(str.split).apply(len)
