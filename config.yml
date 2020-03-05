@@ -12,18 +12,14 @@ UPR_action:
   text_col: 'Recommendation'
   sep: ','
 
-PlanInternational_themes_update:
-  data_file: 'gs://classification_data/PlanInternational_themes_joint_data.csv'
-  pkl_file: 'gs://classification_data/PlanInternational_themes_joint_data.pkl'
-  label_col: 'label'
-  text_col: 'text'
-  sep: ','
-
 PlanInternational_themes:
   data_file: 'gs://classification_data/PlanInternational_themes.csv'
   pkl_file: 'gs://classification_data/PlanInternational_themes.pkl'
   label_col: 'label'
   text_col: 'text'
+  add_col:
+    - 'retrieved'
+    - 'sharedId'
   sep: '$'
 
 PlanInternational_persons:
@@ -31,25 +27,14 @@ PlanInternational_persons:
   pkl_file: 'gs://classification_data/PlanInternational_affected_persons.pkl'
   label_col: 'label'
   text_col: 'text'
+  add_col:
+    - 'retrieved'
+    - 'sharedId'
   sep: '$'
-
-PlanInternational_persons_update:
-  data_file: 'gs://classification_data/PlanInternational_affected_persons_joint_data.csv'
-  pkl_file: 'gs://classification_data/PLAN_affected_persons_joint_data.pkl'
-  label_col: 'label'
-  text_col: 'text'
-  sep: ','
 
 PlanInternational_paragraphs:
   data_file: 'gs://classification_data/PlanInternational_paragraphs.csv'
   pkl_file: 'gs://classification_data/PLAN_paragraphs.pkl'
-  label_col: 'label'
-  text_col: 'text'
-  sep: ','
-
-PlanInternational_themes_200:
-  data_file: 'gs://classification_data/PlanInternational_themes_200.csv'
-  pkl_file: 'gs://classification_data/PLAN_themes_200.pkl'
   label_col: 'label'
   text_col: 'text'
   sep: ','
@@ -59,6 +44,8 @@ UHRI_themes:
   pkl_file: 'gs://classification_data/UHRI_themes.pkl'
   label_col: 'themes'
   text_col: 'text'
+  add_col:
+    - 'retrieved'
   sep: '$'
 
 UHRI_affected_persons:
@@ -66,6 +53,8 @@ UHRI_affected_persons:
   pkl_file: 'gs://classification_data/UHRI_affected_persons.pkl'
   label_col: 'affected_persons'
   text_col: 'text'
+  add_col:
+    - 'retrieved'
   sep: '$'
 
 UHRI_sdgs:
@@ -73,4 +62,6 @@ UHRI_sdgs:
   pkl_file: 'gs://classification_data/UHRI_sdgs.pkl'
   label_col: 'sdgs'
   text_col: 'text'
+  add_col:
+    - 'retrieved'
   sep: '$'

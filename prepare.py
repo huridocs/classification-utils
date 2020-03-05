@@ -10,8 +10,14 @@ def prepare(data_id, cfg_path='./config.yml'):
     data = io.load_csv(cfg['data_file'])
 
     data.rename(columns={cfg['text_col']: 'text'}, inplace=True)
-    data = data[['text', cfg['label_col']]]
-    data.dropna(inplace=True)
+
+    if 'add_col' in cfg.keys():
+        columns = cfg['add_col'] + ['text', cfg['label_col']]
+        data = data[columns]
+    else:
+        data = data[['text', cfg['label_col']]]
+
+    data.dropna(subset=['text', cfg['label_col']], inplace=True)
     data.drop_duplicates(inplace=True)
 
     data['seq_length'] = data.text.map(str.split).apply(len)
@@ -23,6 +29,7 @@ def prepare(data_id, cfg_path='./config.yml'):
     unique_labels = format_labels.get_unique(data.label.tolist())
     data['one_hot_labels'] = data['label'].apply(format_labels.encode_onehot,
                                                  args=[unique_labels])
+
     io.to_pickle(data, cfg['pkl_file'])
 
 
