@@ -38,12 +38,14 @@ def create_model(bert_config, is_training, input_ids, input_mask,
 
         logits = tf.matmul(output_layer, output_weights, transpose_b=True)
         logits = tf.nn.bias_add(logits, output_bias)
+
         probabilities = tf.nn.softmax(logits, axis=-1)
         log_probs = tf.nn.log_softmax(logits, axis=-1)
 
-        one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
+        #one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
 
-        per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
+        #per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
+        per_example_loss = -tf.reduce_sum(labels * log_probs, axis=-1)
         loss = tf.reduce_mean(per_example_loss)
 
         return (loss, per_example_loss, logits, probabilities)
@@ -70,15 +72,23 @@ def model_fn_builder(use_tpu):
             input_ids = features["input_ids"]
             segment_ids = features["segment_ids"]
 
+            model = modeling.BertModel(config=params['bert_config'],
+                                       is_training=params['trainable_bert'],
+                                       input_ids=input_ids,
+                                       input_mask=input_mask,
+                                       token_type_ids=segment_ids,
+                                       use_one_hot_embeddings=True)
+
+            # In the demo, we are doing a simple classification task on the entire
             # TODO: Check is_training === trainable Bert j?
-            model = create_model(bert_config=params['bert_config'],
-                                 is_training=params['trainable_bert'],
-                                 num_labels=params['num_classes'],
-                                 labels=labels,
-                                 segment_ids=segment_ids,
-                                 input_ids=input_ids,
-                                 input_mask=input_mask,
-                                 use_one_hot_embeddings=True)
+            # model = create_model(bert_config=params['bert_config'],
+            #                     is_training=params['trainable_bert'],
+            #                     num_labels=params['num_classes'],
+            #                     labels=label_ids,
+            #                     segment_ids=segment_ids,
+            #                     input_ids=input_ids,
+            #                     input_mask=input_mask,
+            #                     use_one_hot_embeddings=True)
 
             # TODO: Find correct place
             tvars = tf.trainable_variables()
@@ -86,6 +96,7 @@ def model_fn_builder(use_tpu):
             # TODO: Is scaffold needed?
             scaffold_fn = None
             if params["init_checkpoint"]:
+                tf.logging.info('Has Checkpoint !!!!!!')
                 (assignment_map, initialized_variable_names
                  ) = modeling.get_assignment_map_from_checkpoint(
                      tvars, params["init_checkpoint"])
