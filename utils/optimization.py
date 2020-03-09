@@ -73,7 +73,7 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu,
 
     tf.logging.info("**** Trainable Variables ****")
     for var in tvars:
-        tf.logging.info("name = %s, shape = %s%s", var.name, var.shape)
+        tf.logging.info("name: {}, shape: {}".format(var.name, var.shape))
 
     grads = tf.gradients(loss, tvars)
 
