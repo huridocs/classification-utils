@@ -111,7 +111,7 @@ def model_fn_builder(use_tpu):
             tf.logging.info("**** Variables - INIT FROM CKPT ****")
             for var in tvars:
                 if var.name in initialized_variable_names:
-                    tf.logging.info("name = %s, shape = %s%s", var.name, var.shape)
+                    tf.logging.info("name: {}, shape: {}".format(var.name, var.shape))
 
             sequence_output = model.get_sequence_output()
             predictions["sequence_output"] = sequence_output
