@@ -93,10 +93,9 @@ def model_fn_builder(use_tpu):
             # TODO: Find correct place
             tvars = tf.trainable_variables()
             initialized_variable_names = {}
-            # TODO: Is scaffold needed?
+
             scaffold_fn = None
             if params["init_checkpoint"]:
-                tf.logging.info('Has Checkpoint !!!!!!')
                 (assignment_map, initialized_variable_names
                  ) = modeling.get_assignment_map_from_checkpoint(
                      tvars, params["init_checkpoint"])
@@ -109,15 +108,10 @@ def model_fn_builder(use_tpu):
                 else:
                     tf.train.init_from_checkpoint(params["init_checkpoint"], assignment_map)
 
-            tf.logging.info("**** Trainable Variables ****")
+            tf.logging.info("**** Variables - INIT FROM CKPT ****")
             for var in tvars:
-                init_string = ""
                 if var.name in initialized_variable_names:
-                    init_string = ", *INIT_FROM_CKPT*"
-                tf.logging.info("  name = %s, shape = %s%s", var.name, var.shape,
-                                init_string)
-
-            # - - - - -
+                    tf.logging.info("name = %s, shape = %s%s", var.name, var.shape)
 
             sequence_output = model.get_sequence_output()
             predictions["sequence_output"] = sequence_output
@@ -175,7 +169,8 @@ def model_fn_builder(use_tpu):
                                                      params["learning_rate"],
                                                      params["num_train_steps"],
                                                      params["num_warmup_steps"],
-                                                     use_tpu)
+                                                     use_tpu,
+                                                     trainable_bert=params['trainable_bert'])
         elif mode == tf.estimator.ModeKeys.EVAL:
 
             def _f1_score(labels, pred):

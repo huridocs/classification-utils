@@ -22,7 +22,8 @@ import re
 import tensorflow as tf
 
 
-def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
+def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu,
+                     trainable_bert=True):
     """Creates an optimizer training op."""
     global_step = tf.train.get_or_create_global_step()
 
@@ -67,6 +68,13 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
         optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
 
     tvars = tf.trainable_variables()
+    if not trainable_bert:
+        tvars = [tvar for tvar in tvars if not tvar.name.startswith('bert')]
+
+    tf.logging.info("**** Trainable Variables ****")
+    for var in tvars:
+        tf.logging.info("name = %s, shape = %s%s", var.name, var.shape)
+
     grads = tf.gradients(loss, tvars)
 
     # This is how the model was pre-trained.
