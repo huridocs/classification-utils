@@ -30,3 +30,15 @@ def decode_onehot(encoding, unique_labels):
     indices = np.where(np.array(encoding) == 1)[0].tolist()
     labels = [unique_labels[ind] for ind in indices]
     return labels
+
+
+def filter_labels(l, labels):
+    return [elem for elem in l if elem in labels]
+
+
+def filter_data(data, labels):
+    data['label'] = data.label.apply(filter_labels, args=[labels])
+    data['str_label'] = data.label.apply(join)
+    data = data[data.str_label != '']
+    data['one_hot_labels'] = data['label'].apply(encode_onehot, args=[labels])
+    return data
