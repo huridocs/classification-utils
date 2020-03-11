@@ -33,12 +33,14 @@ def decode_onehot(encoding, unique_labels):
 
 
 def filter_labels(l, labels):
-    return [elem for elem in l if elem in labels]
+    return sorted([elem for elem in l if elem in labels])
 
 
 def filter_data(data, labels):
+    labels.sort()
     data['label'] = data.label.apply(filter_labels, args=[labels])
     data['str_label'] = data.label.apply(join)
     data = data[data.str_label != '']
+    labels = labels + ['nan']
     data['one_hot_labels'] = data['label'].apply(encode_onehot, args=[labels])
     return data
