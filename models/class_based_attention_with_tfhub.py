@@ -1,54 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
+import tensorflow_hub as hub
 
-from utils import optimization, modeling
-
-
-def create_model(bert_config, is_training, input_ids, input_mask,
-                 segment_ids, labels, num_labels, use_one_hot_embeddings):
-
-    model = modeling.BertModel(config=bert_config,
-                               is_training=is_training,
-                               input_ids=input_ids,
-                               input_mask=input_mask,
-                               token_type_ids=segment_ids,
-                               use_one_hot_embeddings=use_one_hot_embeddings)
-
-    # In the demo, we are doing a simple classification task on the entire
-    # segment.
-    #
-    # If you want to use the token-level output, use model.get_sequence_output()
-    # instead.
-    output_layer = model.get_pooled_output()
-
-    hidden_size = output_layer.shape[-1].value
-
-    output_weights = tf.get_variable(
-        "output_weights", [num_labels, hidden_size],
-        initializer=tf.truncated_normal_initializer(stddev=0.02))
-
-    output_bias = tf.get_variable("output_bias", [num_labels],
-                                  initializer=tf.zeros_initializer())
-
-    with tf.variable_scope("loss"):
-        if is_training:
-            # I.e., 0.1 dropout
-            output_layer = tf.nn.dropout(output_layer, keep_prob=0.9)
-
-        logits = tf.matmul(output_layer, output_weights, transpose_b=True)
-        logits = tf.nn.bias_add(logits, output_bias)
-
-        probabilities = tf.nn.softmax(logits, axis=-1)
-        log_probs = tf.nn.log_softmax(logits, axis=-1)
-
-        #one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
-
-        #per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
-        per_example_loss = -tf.reduce_sum(labels * log_probs, axis=-1)
-        loss = tf.reduce_mean(per_example_loss)
-
-        return (loss, per_example_loss, logits, probabilities)
+from utils import optimization
 
 
 def model_fn_builder(use_tpu):
@@ -71,51 +26,17 @@ def model_fn_builder(use_tpu):
         if "embeddings" not in features:
             input_ids = features["input_ids"]
             segment_ids = features["segment_ids"]
-
-            model = modeling.BertModel(config=params['bert_config'],
-                                       is_training=params['trainable_bert'],
-                                       input_ids=input_ids,
-                                       input_mask=input_mask,
-                                       token_type_ids=segment_ids,
-                                       use_one_hot_embeddings=True)
-
-            # In the demo, we are doing a simple classification task on the entire
-            # TODO: Check is_training === trainable Bert j?
-            # model = create_model(bert_config=params['bert_config'],
-            #                     is_training=params['trainable_bert'],
-            #                     num_labels=params['num_classes'],
-            #                     labels=label_ids,
-            #                     segment_ids=segment_ids,
-            #                     input_ids=input_ids,
-            #                     input_mask=input_mask,
-            #                     use_one_hot_embeddings=True)
-
-            # TODO: Find correct place
-            tvars = tf.trainable_variables()
-            initialized_variable_names = {}
-
-            scaffold_fn = None
-            if params["init_checkpoint"]:
-                (assignment_map, initialized_variable_names
-                 ) = modeling.get_assignment_map_from_checkpoint(
-                     tvars, params["init_checkpoint"])
-                if use_tpu:
-                    def tpu_scaffold():
-                        tf.train.init_from_checkpoint(params["init_checkpoint"],
-                                                      assignment_map)
-                        return tf.train.Scaffold()
-                    scaffold_fn = tpu_scaffold
-                else:
-                    tf.train.init_from_checkpoint(params["init_checkpoint"], assignment_map)
-
-            tf.logging.info("**** Variables - INIT FROM CKPT ****")
-            for var in tvars:
-                if var.name in initialized_variable_names:
-                    tf.logging.info("name: {}, shape: {}".format(var.name, var.shape))
-
-            sequence_output = model.get_sequence_output()
+            bert_module = hub.Module(params["bert_model_hub"],
+                                     tags=tags,
+                                     trainable=params["trainable_bert"])
+            bert_inputs = dict(input_ids=input_ids,
+                               input_mask=input_mask,
+                               segment_ids=segment_ids)
+            bert_outputs = bert_module(inputs=bert_inputs,
+                                       signature="tokens",
+                                       as_dict=True)
+            sequence_output = bert_outputs['sequence_output']
             predictions["sequence_output"] = sequence_output
-
         else:
             sequence_output = features["embeddings"]
 
@@ -169,8 +90,7 @@ def model_fn_builder(use_tpu):
                                                      params["learning_rate"],
                                                      params["num_train_steps"],
                                                      params["num_warmup_steps"],
-                                                     use_tpu,
-                                                     trainable_bert=params['trainable_bert'])
+                                                     use_tpu)
         elif mode == tf.estimator.ModeKeys.EVAL:
 
             def _f1_score(labels, pred):
@@ -218,7 +138,6 @@ def model_fn_builder(use_tpu):
             return tf.contrib.tpu.TPUEstimatorSpec(mode=mode,
                                                    loss=loss,
                                                    train_op=train_op,
-                                                   scaffold_fn=scaffold_fn,
                                                    eval_metrics=eval_metrics,
                                                    predictions=predictions)
         else:

@@ -19,7 +19,6 @@ from __future__ import absolute_import, division, print_function
 import collections
 import re
 import unicodedata
-from typing import List
 
 import six
 import tensorflow as tf
@@ -194,7 +193,7 @@ class BasicTokenizer(object):
         text = self._tokenize_chinese_chars(text)
 
         orig_tokens = whitespace_tokenize(text)
-        split_tokens: List[str] = []
+        split_tokens = []
         for token in orig_tokens:
             if self.do_lower_case:
                 token = token.lower()
