@@ -1,12 +1,15 @@
 from collections import Counter
-from typing import List
 
 from utils.visualize import bar_plot
 
 
 def category_distribution(data, col='label'):
-    all_assigned_labels: List[str] = sum(data[col].tolist(), [])
-    return Counter(all_assigned_labels)
+    counter: Counter = Counter()
+
+    for each_label_list in data[col]:
+        counter.update(each_label_list)
+
+    return counter
 
 
 def plot_category_distribution(data, title='', log=False):

@@ -13,9 +13,14 @@ def join(labels):
 
 
 def get_unique(labels):
-    all_labels: List[str] = sum(labels, [])
-    all_labels.append('nan')
-    return sorted(list(set(all_labels)))
+    all_labels_set = set()
+    for each_label_list in labels:
+        for label in each_label_list:
+            all_labels_set.add(label)
+    all_labels_list = list(all_labels_set)
+    all_labels_list.sort()
+    all_labels_list.append('nan')
+    return all_labels_list
 
 
 def encode_onehot(label_list, unique_labels):
