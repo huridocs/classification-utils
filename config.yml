@@ -44,8 +44,6 @@ UHRI_themes:
   pkl_file: 'gs://classification_data/UHRI_themes.pkl'
   label_col: 'themes'
   text_col: 'text'
-  add_col:
-    - 'retrieved'
   sep: '$'
 
 UHRI_affected_persons:
@@ -53,8 +51,6 @@ UHRI_affected_persons:
   pkl_file: 'gs://classification_data/UHRI_affected_persons.pkl'
   label_col: 'affected_persons'
   text_col: 'text'
-  add_col:
-    - 'retrieved'
   sep: '$'
 
 UHRI_sdgs:
@@ -62,6 +58,4 @@ UHRI_sdgs:
   pkl_file: 'gs://classification_data/UHRI_sdgs.pkl'
   label_col: 'sdgs'
   text_col: 'text'
-  add_col:
-    - 'retrieved'
   sep: '$'

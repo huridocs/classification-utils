@@ -33,8 +33,8 @@ def evaluate(data, labels):
     confusion_matrices = confusion_matrix(data)
     evaluation = compute_metrics(confusion_matrices, labels)
     micro_avg = micro_average(evaluation)
-    evaluation = evaluation.append(pd.DataFrame(micro_avg, index=['micro_avg']))
-    evaluation.loc['macro_avg'] = evaluation.mean(axis=0)
+    evaluation = evaluation.append(pd.DataFrame(micro_avg, index=['micro_avg (weighted average)']))
+    evaluation.loc['macro_avg (all labels weigh the same)'] = evaluation.mean(axis=0)
     return evaluation.reindex(
         columns=['f1', 'prec', 'recall', 'tp', 'fp', 'fn'])
 

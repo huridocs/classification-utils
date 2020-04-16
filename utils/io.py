@@ -2,6 +2,8 @@ import tensorflow as tf
 import pandas as pd
 import pickle
 import yaml
+from google.cloud import storage
+import os
 
 
 def load_csv(path, delimiter=','):
@@ -20,5 +22,16 @@ def to_pickle(df, path):
 
 
 def load_pickle(path):
-    with tf.gfile.Open(path, 'rb') as f:
-        return pickle.load(f)
+    bucket_name = path.split('/')[2]
+    file_path = '/'.join(path.split('/')[3:])
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(file_path)
+    blob.download_to_filename('download.pkl')
+
+    with open('download.pkl', 'rb') as f:
+        data = pickle.load(f)
+
+    os.remove('download.pkl')
+    return data

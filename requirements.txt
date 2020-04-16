@@ -1,4 +1,4 @@
-pandas==0.25
+pandas==0.24
 numpy==1.17
 tensorflow==1.15.0
 tensorflow-hub>=0.5.0
@@ -9,6 +9,7 @@ matplotlib==3.1.1
 scipy==1.4.1
 scikit-learn==0.22.1
 nltk==3.4.5
+google-cloud-storage==1.27.0
 
 # Dev:
 pip
