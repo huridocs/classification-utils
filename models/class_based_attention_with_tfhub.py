@@ -84,8 +84,10 @@ def model_fn_builder(use_tpu):
             with tf.variable_scope("loss"):
                 per_example_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     labels=label_ids, logits=logits)
-                scaled_loss = tf.multiply(per_example_loss, params['weights'])
-                loss = tf.reduce_mean(scaled_loss)
+                class_weights = tf.constant([params['weights']])
+                weights = tf.reduce_sum(class_weights * label_ids, axis=1)
+                weighted_losses = per_example_loss * weights
+                loss = tf.reduce_mean(weighted_losses)
         if mode == tf.estimator.ModeKeys.TRAIN:
             train_op = optimization.create_optimizer(loss,
                                                      params["learning_rate"],
