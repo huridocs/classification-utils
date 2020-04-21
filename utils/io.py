@@ -24,7 +24,7 @@ def to_pickle(df, path):
 def load_pickle(path):
     bucket_name = path.split('/')[2]
     file_path = '/'.join(path.split('/')[3:])
-    storage_client = storage.Client()
+    storage_client = storage.Client('bert-classification-248511')
 
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(file_path)
