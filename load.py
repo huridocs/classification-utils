@@ -2,13 +2,14 @@ import prepare
 from utils import format_labels, io
 
 
-def load_data(cfg_path, DATA_ID):
-    cfg = io.load_yml(cfg_path, DATA_ID)
+def load_data(configuration_path, DATA_ID):
+    configuration = io.load_yml(configuration_path, DATA_ID)
     try:
-        data = io.load_pickle(cfg['pkl_file'])
+        data = io.load_pickle(configuration['pkl_file'])
     except:
-        prepare.prepare(DATA_ID, cfg['pkl_file'])
-        data = io.load_pickle(cfg['pkl_file'])
+        prepare.prepare(DATA_ID, configuration['pkl_file'])
+        # data = io.load_pickle(configuration['pkl_file'])
+        data = None
 
     return data
 
