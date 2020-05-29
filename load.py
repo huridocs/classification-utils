@@ -7,9 +7,8 @@ def load_data(configuration_path, DATA_ID):
     try:
         data = io.load_pickle(configuration['pkl_file'])
     except:
-        prepare.prepare(DATA_ID, configuration['pkl_file'])
-        # data = io.load_pickle(configuration['pkl_file'])
-        data = None
+        prepare.prepare(DATA_ID, configuration_path)
+        data = io.load_pickle(configuration['pkl_file'])
 
     return data
 
