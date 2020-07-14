@@ -47,8 +47,8 @@ UHRI_themes:
   sep: '$'
 
 UHRI_affected_persons:
-  data_file: 'gs://classification_data/UHRI.csv'
-  pkl_file: 'gs://classification_data/UHRI_affected_persons.pkl'
+  data_file: 'gs://classification_data/UHRI_Affected_persons_2020_07_14.csv'
+  pkl_file: 'gs://classification_data/UHRI_affected_persons_2020_07_14.pkl'
   label_col: 'affected_persons'
   text_col: 'text'
   sep: '$'
