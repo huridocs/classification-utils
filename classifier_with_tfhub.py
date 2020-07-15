@@ -141,11 +141,18 @@ def model_fn_builder(num_labels, learning_rate, num_train_steps,
 
 def create_tokenizer_from_hub_module(bert_hub_module_handle):
     """Get the vocab file and casing info from the Hub module."""
+    print('starting create_tokenizer_from_hub_module')
     with tf.Graph().as_default():
+        print('tf.Graph().as_default()')
         bert_module = hub.Module(bert_hub_module_handle)
+        print('bert_module loaded')
         tokenization_info = bert_module(signature="tokenization_info",
                                         as_dict=True)
+        print('tokenization_info')
+
         with tf.Session() as sess:
+            print('Session')
+
             vocab_file, do_lower_case = sess.run([
                 tokenization_info["vocab_file"],
                 tokenization_info["do_lower_case"]
