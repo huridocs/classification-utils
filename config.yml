@@ -42,8 +42,8 @@ PlanInternational_paragraphs:
 UHRI_themes:
   data_file: 'gs://classification_data/UHRI_themes_2020_08_21.csv'
   pkl_file: 'gs://classification_data/UHRI_themes.pkl'
-  label_col: 'Themes'
-  text_col: 'Text'
+  label_col: 'themes'
+  text_col: 'text'
   sep: '$'
 
 UHRI_affected_persons:
