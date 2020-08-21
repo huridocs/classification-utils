@@ -40,10 +40,10 @@ PlanInternational_paragraphs:
   sep: ','
 
 UHRI_themes:
-  data_file: 'gs://classification_data/UHRI.csv'
+  data_file: 'gs://classification_data/UHRI_themes_2020_08_21.csv'
   pkl_file: 'gs://classification_data/UHRI_themes.pkl'
-  label_col: 'themes'
-  text_col: 'text'
+  label_col: 'Themes'
+  text_col: 'Text'
   sep: '$'
 
 UHRI_affected_persons:
