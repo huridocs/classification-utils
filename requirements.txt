@@ -1,6 +1,6 @@
 pandas==0.25
 numpy==1.17
-tensorflow==1.15.3
+tensorflow==2.5.3
 tensorflow-hub>=0.5.0
 PyYAML==5.1.2
 pyyml==0.0.2
